@@ -163,4 +163,4 @@ typedef struct _SPOOF_SHELLCODE_TEMPLATE {
 
 Github仓库：[CallStackSpoof](https://github.com/Shinn-Home/CallStackSpoof)
 
-此方案理论上同时支持R0、R3，实现代码大同小异，R0层驱动源码已经开源，测试环境为`Win10 19044`，欢迎感兴趣的朋友点个Star。
+此方案理论上同时支持R0 / R3，实现代码大同小异，R0层驱动源码已经开源，测试环境为`Win10 19044`，欢迎感兴趣的朋友点个Star。
