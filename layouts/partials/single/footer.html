@@ -1,0 +1,58 @@
+{{- $prevPage := false -}}
+{{- $nextPage := false -}}
+{{- if or (.Params.prev) (.Params.next) -}}
+    {{- with .Params.prev -}}
+        {{- $prevPage = $.Site.GetPage . -}}
+    {{- end -}}
+    {{- with .Params.next -}}
+        {{- $nextPage = $.Site.GetPage . -}}
+    {{- end -}}
+{{- else -}}
+    {{- $prevPage = .PrevInSection -}}
+    {{- $nextPage = .NextInSection -}}
+{{- end -}}
+
+<div class="post-bottom-card" id="post-footer">
+    {{- with .Params.tags -}}
+        <div class="post-bottom-tags">
+            {{- range . -}}
+                {{- $tagPath := partialCached "function/path.html" . . -}}
+                {{- $tagPage := printf "/tags/%v" $tagPath | $.Site.GetPage -}}
+                {{- $tagHref := printf "/tags/%v/" $tagPath | relLangURL -}}
+                {{- with $tagPage -}}
+                    <a class="post-bottom-tag" href="{{ .RelPermalink }}">
+                        <i class="fas fa-tag post-bottom-tag-icon" aria-hidden="true"></i>
+                        <span>{{ .Title }}</span>
+                    </a>
+                {{- else -}}
+                    <a class="post-bottom-tag" href="{{ $tagHref }}">
+                        <i class="fas fa-tag post-bottom-tag-icon" aria-hidden="true"></i>
+                        <span>{{ . }}</span>
+                    </a>
+                {{- end -}}
+            {{- end -}}
+        </div>
+    {{- end -}}
+
+    <div class="post-bottom-divider"></div>
+
+    <nav class="post-bottom-nav" aria-label="Post navigation">
+        <div class="post-bottom-nav-item post-bottom-nav-prev{{ if not $prevPage }} is-disabled{{ end }}">
+            <div class="post-bottom-nav-label">上一篇</div>
+            {{- with $prevPage -}}
+                <a class="post-bottom-nav-link" href="{{ .RelPermalink }}">← {{ .Title }}</a>
+            {{- else -}}
+                <div class="post-bottom-nav-empty">暂无</div>
+            {{- end -}}
+        </div>
+
+        <div class="post-bottom-nav-item post-bottom-nav-next{{ if not $nextPage }} is-disabled{{ end }}">
+            <div class="post-bottom-nav-label">下一篇</div>
+            {{- with $nextPage -}}
+                <a class="post-bottom-nav-link" href="{{ .RelPermalink }}">{{ .Title }} →</a>
+            {{- else -}}
+                <div class="post-bottom-nav-empty">暂无</div>
+            {{- end -}}
+        </div>
+    </nav>
+</div>
