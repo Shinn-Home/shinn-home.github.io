@@ -1,0 +1,46 @@
+{{- $author := .Params.author | default .Site.Params.Author.name | default .Site.Params.author.name | default "Shinn" -}}
+{{- $dateFormat := .Site.Params.dateFormat | default "2006-01-02" -}}
+{{- $categories := slice -}}
+
+{{- with .Params.categories -}}
+    {{- range . -}}
+        {{- $categoryPath := partialCached "function/path.html" . . -}}
+        {{- $categoryPage := printf "/categories/%v" $categoryPath | $.Site.GetPage -}}
+        {{- if $categoryPage -}}
+            {{- $categories = $categories | append (printf `<a class="home-post-category-link" href="%v">%v</a>` $categoryPage.RelPermalink $categoryPage.Title) -}}
+        {{- else -}}
+            {{- $categories = $categories | append . -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+
+<article class="home-post-card" itemscope itemtype="http://schema.org/Article">
+    <h2 class="home-post-title" itemprop="name headline">
+        <a href="{{ .RelPermalink }}">{{ .Title | emojify }}</a>
+    </h2>
+
+    <div class="home-post-meta">
+        <span class="home-post-author">{{ $author }}</span>
+        <span class="home-post-dot">&middot;</span>
+        {{- $date := $dateFormat | .Date.Format -}}
+        <time datetime="{{ $date }}">{{ $date }}</time>
+        {{- with $categories -}}
+            <span class="home-post-dot">&middot;</span>
+            <span class="home-post-category">{{ delimit . ", " | safeHTML }}</span>
+        {{- end -}}
+    </div>
+
+    {{- with .Params.tags -}}
+        <div class="home-post-tags">
+            {{- range . -}}
+                {{- $tagPath := partialCached "function/path.html" . . -}}
+                {{- $tagPage := printf "/tags/%v" $tagPath | $.Site.GetPage -}}
+                {{- if $tagPage -}}
+                    <a class="home-post-tag" href="{{ $tagPage.RelPermalink }}">{{ $tagPage.Title }}</a>
+                {{- else -}}
+                    <span class="home-post-tag">{{ . }}</span>
+                {{- end -}}
+            {{- end -}}
+        </div>
+    {{- end -}}
+</article>

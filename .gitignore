@@ -1,0 +1,10 @@
+/public/
+/resources/_gen/
+/.hugo_cache/
+/.hugo_build.lock
+/hugo-server.log
+/hugo-server.err.log
+/node_modules/
+
+.DS_Store
+Thumbs.db
