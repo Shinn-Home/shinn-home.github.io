@@ -15,7 +15,13 @@ lightgallery: true
 
 <!--more-->
 
-# [原创]Win11 26H1内核异常体系分析与实验：提前接管用户态、内核态异常，实现无痕Hook、进程保护、反调试，附PoC
+# Win11 26H1内核异常体系分析与实验：提前接管用户态、内核态异常，实现无痕Hook、进程保护、反调试，附PoC
+
+## 文章目录速览
+
+[TOC]
+
+
 
 ## 1. 写在前面
 
@@ -29,55 +35,6 @@ lightgallery: true
 > 笔者最初原稿是4种提前接管异常的手法，后来发现，利用InstrumentationCallback提前接管异常，论坛内已经有师傅发文公开了，所以发帖前删除了这部分内容，避免重复赘述
 
 ​	本文涉及到的大部分工程文件已经整理好并开源到Github，欢迎给仓库Star
-
-
-
-## 文章目录速览
-
-1. 开篇碎碎念
-2. Win11 26H1内核异常体系分析
-    2.1 内核页表隔离（KVA Shadow）
-    2.1.1 2套CR3引入的效率问题
-    2.2 KiDivideErrorFaultShadow
-    2.3 KiDivideErrorFault
-    2.3.1 R0异常派发路径
-    2.3.2 R3异常路径
-    2.4 KiExceptionDispatch
-    2.5 KiDispatchException
-    2.5.1 上下文转换（构造Context）
-    2.5.2 内部错误码转换
-    2.5.3 R0异常路径
-    2.5.4 R3异常路径（FirstChance路径）
-    2.5.5 R3异常路径（SecondChance路径）
-    2.5.6 R3异常路径小结
-    2.6 Win11 26H1异常体系总结
-3. 提前接管用户态异常方法1
-    3.1 ntdll!KiUserExceptionDispatcher
-    3.2 ntdll!Wow64PrepareForException
-4. 无痕Hook代码实验
-    4.1 制造影子模块（ShadowModule）
-    4.2 向目标函数页面注入异常（隐藏不可执行页面）
-    4.3 修复控制流防护问题（CFG）
-    4.4 修复全局变量不一致
-    4.5 给影子模块挂Inline Hook
-5. 提前接管用户态异常方法2
-    5.1 nt!PsPicoDispatchException
-    5.2 分析PicoProvider注册流程
-    5.3 注册成为PicoProvider
-    5.4 将目标进程设置为WSL子进程
-    5.5 利用Pico异常处理回调实现无痕Hook
-    5.6 利用Pico异常回调实现反调试效果
-    5.7 WSL子进程进程保护
-6. 提前接管用户态、内核态异常方法
-    6.1 Win11 26H1
-    6.2 Win11 25H2及以下
-    6.2.1 特征码定位HalpPerformanceCounter
-    6.2.2 替换Hal函数指针
-    6.2.3 堆栈回溯筛选出异常派发调用
-    6.2.4 从堆栈中恢复丢失的异常信息
-    6.2.5 构造中断返回帧，恢复异常派发流程
-    6.2.6 大量踩坑
-7. Git仓库开源地址
 
 
 
