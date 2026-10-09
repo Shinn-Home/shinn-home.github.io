@@ -1,12 +1,12 @@
 ---
-title: "\"无痕\"驱动的检测与分析：重映射驱动靶场构造、扫描与特征剥离，附PoC"
+title: "网游外挂\"无痕\"驱动的检测与分析：重映射驱动靶场构造、扫描与特征剥离，附PoC"
 date: 2026-04-22T12:00:00+08:00
 lastmod: 2026-04-22T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
-tags: [ "Windows内核",  "无痕驱动", "扫描内存",  "Manual Map Driver", "reverse engineering" ]
-categories: ["Security Research"]
+tags: [ "反作弊/反外挂", "Windows内核",  "无痕驱动", "扫描内存",  "Manual Map Driver", "reverse engineering" ]
+categories: ["反作弊/反外挂"]
 
 twemoji: false
 lightgallery: true

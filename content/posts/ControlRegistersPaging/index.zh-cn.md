@@ -1,12 +1,12 @@
 ---
-title: "控制寄存器与分页保护模式"
+title: "保护模式(2)：分页保护模式与控制寄存器"
 date: 2021-08-08T12:00:00+08:00
 lastmod: 2021-08-08T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
 tags: ["控制寄存器", "分页保护模式", "CR3", "PAE", "TLB", "Windows内核"]
-categories: ["Windows内核基础"]
+categories: ["Windows内核分析"]
 
 twemoji: false
 lightgallery: true

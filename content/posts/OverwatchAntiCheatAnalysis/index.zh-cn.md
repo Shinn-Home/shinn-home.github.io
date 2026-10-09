@@ -1,12 +1,12 @@
 ---
-title: "网易守望先锋反作弊驱动分析：从代码去混淆到敏感行为还原，CVE-2025-45737任意内核读写漏洞复现、提权实验，附PoC"
+title: "守望先锋反作弊驱动分析：从代码去混淆到敏感行为还原，CVE-2025-45737任意内核读写漏洞复现、提权实验，附PoC"
 date: 2026-10-02T12:00:00+08:00
 lastmod: 2026-10-02T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
-tags: ["反作弊", "Windows内核", "reverse engineering", "代码去混淆", "内核读写", "内核注入", "CVE-2025-45737", "提权"]
-categories: ["Security Research"]
+tags: ["反作弊/反外挂",  "Windows内核", "reverse engineering", "代码去混淆", "内核读写", "内核注入", "CVE-2025-45737", "提权"]
+categories: ["反作弊/反外挂"]
 
 twemoji: false
 lightgallery: true
@@ -15,7 +15,7 @@ lightgallery: true
 <!--more-->
 
 ## 文章已下架
-本文首发于看雪安全论坛，应**网易法务**要求删除文章，文章已下架。
+本文首发于看雪安全论坛，应**网易法务**要求删除文章，看雪论坛文章删除、个人博客已下架。
 
 
 

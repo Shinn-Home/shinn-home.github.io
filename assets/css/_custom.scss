@@ -15,14 +15,31 @@
     justify-content: flex-start;
 
     .card-item {
+      // 分类卡片改为单列布局
+      // 主题原为 width: 45% + padding: 0 2%（content-box，两列占 98%）
+      // 改为整宽时必须配 border-box，否则 100% + 4% padding 会横向溢出
+      width: 100%;
+      box-sizing: border-box;
       margin-top: 0;
       min-height: auto;
+
+      // 单列后各分类之间需要留出间距，否则与分类内的文章条目间距难以区分
+      & + .card-item {
+        margin-top: 2rem;
+      }
 
       .card-item-wrapper {
         .card-item-title {
           margin-top: 0;
         }
       }
+    }
+
+    // 日期列需容纳完整的 YYYY-MM-DD
+    // 主题默认 .archive-item-date { width: 5em } 只够 MM-DD，且未禁止换行
+    .archive-item-date {
+      width: 6.5em;
+      white-space: nowrap;
     }
   }
 }

@@ -9,7 +9,7 @@ draft: false
 author: "Shinn"
 images: []
 tags: ["公告", "置顶"]
-categories: []
+categories: ["博客公告"]
 
 twemoji: false
 lightgallery: true

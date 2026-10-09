@@ -1,12 +1,12 @@
 ---
-title: "保护模式与 x86 汇编基础"
+title: "保护模式(1)：段保护模式与 x86 汇编基础"
 date: 2021-07-26T12:00:00+08:00
 lastmod: 2021-07-26T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
 tags: ["保护模式", "x86汇编", "Windows内核", "段寄存器", "GDT"]
-categories: ["Windows内核基础"]
+categories: ["Windows内核分析"]
 
 twemoji: false
 lightgallery: true
