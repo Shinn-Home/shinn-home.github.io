@@ -1,5 +1,7 @@
 {{- /* 项目级覆盖：对应 themes/LoveIt/layouts/taxonomy.html
-       仅作用于 categories 分类索引页（/categories/），在其基础上为每篇文章增加了日期显示。
+       仅作用于 categories 分类索引页（/categories/），在其基础上做了两处改动：
+         1) 为每篇文章增加日期显示；
+         2) 去掉主题「每个分类只列前 5 篇，其余收进 更多>> 」的限制，改为全部展开。
        日期格式读取 hugo.toml 的 params.dateFormat（默认 "2006-01-02"），与首页文章卡片保持一致。
        （标签/分类详情页用的是 params.list.dateFormat，那里按年份分组，只显示 MM-DD。）
        注意：若日后升级主题的 taxonomy.html，需要手动同步该模板的其它改动。 */ -}}
@@ -32,7 +34,8 @@
                                 <i class="far fa-folder" aria-hidden="true"></i>&nbsp;{{ .Page.Title }}
                             </a>
                         </h3>
-                        {{- range first 5 $pages -}}
+                        {{- /* 不限制条数，全部展开；已移除主题的 first 5 + 更多>> 逻辑 */ -}}
+                        {{- range $pages -}}
                             <article class="archive-item">
                                 <a href="{{ .RelPermalink }}" class="archive-item-link">
                                     {{- .Title | emojify -}}
@@ -41,11 +44,6 @@
                                     {{- $.Site.Params.dateFormat | default "2006-01-02" | .Date.Format -}}
                                 </span>
                             </article>
-                        {{- end -}}
-                        {{- if gt (len $pages) 5 -}}
-                            <span class="more-post">
-                                <a href="{{ .RelPermalink }}" class="more-single-link">{{ T "more" }} >></a>
-                            </span>
                         {{- end -}}
                     </div>
                 </div>

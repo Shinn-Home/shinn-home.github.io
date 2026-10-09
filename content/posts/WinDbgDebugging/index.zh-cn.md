@@ -1,5 +1,5 @@
 ---
-title: "WinDbg 调试"
+title: "WinDbg 调试技巧"
 date: 2021-07-21T12:00:00+08:00
 lastmod: 2021-07-21T12:00:00+08:00
 draft: false
