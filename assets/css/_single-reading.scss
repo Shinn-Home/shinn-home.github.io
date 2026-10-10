@@ -1,0 +1,810 @@
+// =============================================================================
+// Single post reading layout / 文章页阅读排版
+// -----------------------------------------------------------------------------
+// 目标: 让「正文 + 目录」作为一个整体在可用区域内居中, 控制正文行宽, 建立统一
+// 的排版节奏, 并降低目录/图片/强调色的视觉噪声.
+//
+// 实现说明(为什么需要这些覆盖):
+//   主题 _page/_index.scss 用 `.page { width: 64%; max-width: 1080px }`, 加上
+//   _core/_media.scss 在 1440/1280/960/680px 再覆盖一次; 而目录 #toc-auto 由
+//   theme.js 用「绝对/固定定位 + left = 正文右边 + 20px」推到正文右侧的剩余空间.
+//   于是正文宽度随视口百分比漂移(1920px 下 1080px 而 1440px 下 788px), 目录只能
+//   吃右侧剩下的宽度, 左侧留白远大于右侧.
+//   这里改为 grid 两列: 第 1 列正文(内容优先, 上限 860px), 第 2 列目录, 两者用
+//   margin: auto 一起居中; 目录脱离文档流并 sticky, 由 CSS 独立完成定位与滚动.
+//
+// 所有规则都限定在 .page.single 内, 不影响首页 / 归档 / 标签页.
+// 变量前缀 --rd- = reading.
+// =============================================================================
+
+:root {
+  // 正文行宽 ~860px, 目录列 272px, 列间距 40px
+  --rd-content-width: 860px;
+  --rd-toc-width: 272px;
+  --rd-gap: 40px;
+  --rd-page-max: 1280px;
+  --rd-gutter: 2rem;
+
+  // 排版节奏
+  --rd-font-size: 1.0625rem; // 17px
+  --rd-line-height: 1.85;
+  --rd-space-1: 0.5rem;
+  --rd-space-2: 0.75rem;
+  --rd-space-3: 1.125rem;
+  --rd-space-4: 1.75rem;
+  --rd-space-5: 2.5rem;
+  --rd-space-6: 3.25rem;
+
+  // 颜色: 深色主题为默认值, 浅色主题在 body[theme=light] 下覆盖
+  --rd-text: #c7cad4;
+  --rd-text-strong: #eceef4;
+  --rd-muted: #9296a3;
+  --rd-faint: #6f7480;
+  --rd-accent: #6bdcff;
+  --rd-hairline: rgba(255, 255, 255, 0.07);
+  --rd-surface: rgba(255, 255, 255, 0.028);
+  --rd-surface-2: rgba(255, 255, 255, 0.05);
+
+  --rd-toc-font-size: 0.8125rem; // 13px: 目录弱于正文但不至于难读
+  --rd-toc-line-height: 1.5;
+  --rd-toc-indent: 0.85rem;
+}
+
+body[theme="light"] {
+  --rd-text: #39404d;
+  --rd-text-strong: #16181d;
+  --rd-muted: #6b7280;
+  --rd-faint: #9aa1ad;
+  --rd-accent: #0b7ea6;
+  --rd-hairline: rgba(15, 23, 42, 0.09);
+  --rd-surface: rgba(15, 23, 42, 0.028);
+  --rd-surface-2: rgba(15, 23, 42, 0.055);
+}
+
+/* =============================================================================
+   1. 页面容器: 正文 + 目录整体居中
+   ============================================================================= */
+
+.page.single {
+  // max-width + margin:auto 居中「正文 + 目录」整体
+  max-width: var(--rd-page-max);
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--rd-gutter);
+  padding-right: var(--rd-gutter);
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns:
+    minmax(0, var(--rd-content-width))
+    minmax(0, var(--rd-toc-width));
+  justify-content: center;
+  column-gap: var(--rd-gap);
+  row-gap: 0;
+  align-items: start;
+}
+
+// 第 1 列: 正文主体(标题 / 元信息 / 静态目录 / 正文)
+// 注意: .toc-aside / .single-main 是 .single-body 的子节点, 而 .single-body 用了
+// display: contents(不生成盒子), 所以这里用后代选择器而不是 '>' 相邻子选择器.
+.page.single .single-main {
+  grid-column: 1;
+  min-width: 0;
+  // 固定顶栏之下的呼吸空间(与原主题 .single-title { margin: 2rem 0 } 接近)
+  padding-top: 1.5rem;
+}
+
+// .single-body 只是语义分组: display: contents 让它不产生盒子,
+// 于是 .single-main / .toc-aside 仍然是上面 grid 的两列.
+// position: relative 让它成为绝对定位目录的包含块(display: contents 时,
+// 只有 position != static 才会成为包含块).
+.page.single > .single-body {
+  display: contents;
+  position: relative;
+}
+
+// 第 2 列: 目录.
+// 整篇目录可能一两千像素高, 若作为普通 grid item 参与排布会把共享的 grid 行撑高
+// (实测 1440px 下第一行被撑到 796px, 标题被推出首屏). 这里让外层脱离文档流,
+// 不再向 grid 贡献固有尺寸; 内层 sticky 在视口内自滚动.
+// --toc-limit 由 single-toc-limit.js 写入: 把外层底边收到
+// "文末卡片顶边 - 目录高度 - 间距", 使 sticky 的可用行程恰好在卡片之前结束
+// (sticky 的包含块是整个 <article>, 纯 CSS 无法在后面的 grid 行之前收住).
+.page.single .toc-aside {
+  grid-column: 2;
+  position: absolute;
+  top: 0;
+  right: var(--rd-gutter);
+  bottom: var(--toc-limit, 0px);
+  width: var(--rd-toc-width);
+  pointer-events: none;
+}
+
+.page.single .toc-aside > #toc-auto {
+  pointer-events: auto;
+}
+
+// 文章底部卡片 / 评论跨满整行, 避免被挤进窄列
+.page.single > .post-bottom-card,
+.page.single > .comment,
+.page.single > #comments,
+.page.single > #gitalk,
+.page.single > #valine,
+.page.single > #giscus,
+.page.single > #utterances,
+.page.single > #waline {
+  grid-column: 1 / -1;
+}
+
+/* =============================================================================
+   2. 目录: 低视觉权重 + 自身滚动 + 单一当前位置标记
+   -----------------------------------------------------------------------------
+   theme.js 会给 #toc-auto 写入内联 position/top/left/maxWidth 并用
+   visibility: hidden 做初始隐藏. 这里用 !important 覆盖内联样式(内联样式优先级
+   高于作者样式表), 改为 sticky, 定位与长目录滚动全部由 CSS 完成, 即使 JS 失效
+   目录依然可见可用.
+   ============================================================================= */
+
+.page.single .toc-aside > #toc-auto {
+  position: sticky !important;
+  top: calc(var(--header-height) + 1.5rem) !important;
+  left: auto !important;
+  right: auto !important;
+  max-width: none !important;
+  width: 100% !important;
+  visibility: visible !important;
+  box-sizing: border-box;
+  // 目录高度必须明显小于视口: 文末卡片 / 评论区在 <article> 内部,
+  // 目录行程被 .toc-aside 的 --toc-limit(正文末尾到文章底部的距离)截断,
+  // 若目录本身高到接近视口高度, 就没有足够下方空间可停, 仍会压住卡片.
+  // 20rem ≈ 320px, 即至少留出 320px 给底部通栏内容.
+  max-height: calc(100vh - 20rem) !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  padding: 0 0 1.25rem 1rem;
+  border-left: 1px solid var(--rd-hairline);
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+// 目录内部滚动条细一些, 不抢注意力
+.page.single .toc-aside > #toc-auto::-webkit-scrollbar {
+  width: 4px;
+}
+
+.page.single .toc-aside > #toc-auto::-webkit-scrollbar-thumb {
+  background-color: var(--rd-hairline);
+  border-radius: 2px;
+}
+
+.page.single .toc {
+  .toc-title {
+    margin: 0 0 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: none;
+    color: var(--rd-faint);
+  }
+
+  .toc-content {
+    font-size: var(--rd-toc-font-size);
+    line-height: var(--rd-toc-line-height);
+    color: var(--rd-muted);
+  }
+
+  .toc-content ul {
+    text-indent: 0;
+    padding-left: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .toc-content > nav > ul {
+    margin: 0;
+  }
+
+  .toc-content ul ul {
+    padding-left: var(--rd-toc-indent);
+    font-size: 0.95em;
+  }
+
+  .toc-content ul ul ul {
+    font-size: 0.9em;
+    color: var(--rd-faint);
+  }
+
+  .toc-content li {
+    margin: 0.1rem 0;
+  }
+
+  .toc-content li > a {
+    display: block;
+    padding: 0.24rem 0.35rem 0.24rem 0;
+    color: inherit;
+    text-decoration: none;
+    border-radius: 4px;
+    @include overflow-wrap(break-word);
+    transition: color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .toc-content li > a:hover {
+    color: var(--rd-text-strong);
+  }
+
+  .toc-content li > a:focus-visible {
+    outline: 2px solid var(--rd-accent);
+    outline-offset: 1px;
+    color: var(--rd-text-strong);
+  }
+
+  // 去掉主题给每个目录条目加的彩色竖线(视觉噪声的主要来源)
+  .toc-content ul a:first-child::before {
+    content: none !important;
+    margin: 0 !important;
+  }
+}
+
+// 仅当前阅读位置有明显强调: 左侧 2px 短标记 + 主文字色
+.page.single .toc-aside > #toc-auto .toc-content a.active {
+  color: var(--rd-text-strong);
+  font-weight: 600;
+  background: transparent;
+}
+
+.page.single .toc-aside > #toc-auto .toc-content a.active::after {
+  content: "";
+  position: absolute;
+  left: -1rem;
+  top: 0.18rem;
+  bottom: 0.18rem;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--rd-accent);
+}
+
+// 标记以条目为定位参照
+.page.single .toc-aside > #toc-auto .toc-content li:has(> a.active) {
+  position: relative;
+}
+
+/* =============================================================================
+   3. 正文排版节奏
+   -----------------------------------------------------------------------------
+   同一段落内部紧凑 / 段落之间适度分隔 / 章节之间留白明显 /
+   标题上方间距大于下方间距.
+   ============================================================================= */
+
+.page.single .content {
+  font-size: var(--rd-font-size);
+  line-height: var(--rd-line-height);
+  color: var(--rd-text);
+  // 避免长串英文/路径/地址把页面撑出横向滚动
+  overflow-wrap: break-word;
+}
+
+.page.single .content > *:first-child {
+  margin-top: 0;
+}
+
+.page.single .content > *:last-child {
+  margin-bottom: 0;
+}
+
+.page.single .content p {
+  margin: var(--rd-space-3) 0;
+}
+
+.page.single .content ul,
+.page.single .content ol {
+  margin: var(--rd-space-3) 0;
+  padding-left: 1.6rem;
+}
+
+.page.single .content li {
+  margin: 0.32rem 0;
+}
+
+.page.single .content li > ul,
+.page.single .content li > ol {
+  margin: 0.32rem 0;
+}
+
+.page.single .content li > p {
+  margin: 0.3rem 0;
+}
+
+// 章节标题
+.page.single .content h1,
+.page.single .content h2,
+.page.single .content h3,
+.page.single .content h4,
+.page.single .content h5,
+.page.single .content h6 {
+  color: var(--rd-text-strong);
+  line-height: 1.4;
+  font-weight: 650;
+  scroll-margin-top: calc(var(--header-height) + 1.25rem);
+}
+
+.page.single .content > h2 {
+  margin: var(--rd-space-6) 0 var(--rd-space-3);
+  font-size: 1.5rem;
+  padding-top: var(--rd-space-4);
+  border-top: 1px solid var(--rd-hairline);
+}
+
+.page.single .content > h2:first-of-type {
+  padding-top: 0;
+  border-top: none;
+}
+
+.page.single .content > h3 {
+  margin: var(--rd-space-5) 0 var(--rd-space-2);
+  font-size: 1.2rem;
+}
+
+.page.single .content > h4 {
+  margin: var(--rd-space-4) 0 var(--rd-space-2);
+  font-size: 1.0625rem;
+}
+
+.page.single .content > h5,
+.page.single .content > h6 {
+  margin: var(--rd-space-4) 0 var(--rd-space-1);
+  font-size: 1rem;
+}
+
+// 标题下方的正文不要再叠加顶部间距, 保持标题与内容关联
+.page.single .content h2 + *,
+.page.single .content h3 + *,
+.page.single .content h4 + *,
+.page.single .content h5 + *,
+.page.single .content h6 + * {
+  margin-top: 0;
+}
+
+.page.single .content hr {
+  margin: var(--rd-space-5) 0;
+  border-top: 1px solid var(--rd-hairline);
+  border-bottom: none;
+}
+
+.page.single .content strong,
+.page.single .content b {
+  color: var(--rd-text-strong);
+  font-weight: 650;
+}
+
+.page.single .content blockquote {
+  margin: var(--rd-space-4) 0;
+  padding: 0.875rem 1.1rem;
+  border-left: 2px solid var(--rd-accent);
+  border-radius: 0 6px 6px 0;
+  background: var(--rd-surface);
+  color: var(--rd-text);
+}
+
+.page.single .content blockquote > *:first-child {
+  margin-top: 0;
+}
+
+.page.single .content blockquote > *:last-child {
+  margin-bottom: 0;
+}
+
+.page.single .content blockquote p {
+  margin: 0.4rem 0;
+}
+
+.page.single .content .footnotes {
+  margin-top: var(--rd-space-5);
+  padding-top: var(--rd-space-3);
+  border-top: 1px solid var(--rd-hairline);
+  font-size: 0.9375rem;
+  color: var(--rd-muted);
+}
+
+// 在深色背景上把链接的辨识度提回来(主题正文链接色偏暗)
+.page.single .content a:not(.header-mark) {
+  color: #7cc4e8;
+  text-underline-offset: 0.2em;
+}
+
+.page.single .content a:not(.header-mark):hover {
+  color: #a6dcf5;
+}
+
+body[theme="light"] .page.single .content a:not(.header-mark) {
+  color: #1668a8;
+}
+
+body[theme="light"] .page.single .content a:not(.header-mark):hover {
+  color: #0f4d7d;
+}
+
+/* =============================================================================
+   4. 元信息 / 文章标题层级
+   ============================================================================= */
+
+.page.single .single-title {
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.005em;
+  margin: 0.5rem 0 0.75rem;
+  color: var(--rd-text-strong);
+  @include overflow-wrap(break-word);
+}
+
+.page.single .single-subtitle {
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  margin: 0 0 0.75rem;
+  color: var(--rd-muted);
+}
+
+.page.single .single-post-meta-block {
+  margin: 0 0 var(--rd-space-4);
+  padding-bottom: var(--rd-space-3);
+  border-bottom: 1px solid var(--rd-hairline);
+}
+
+.page.single .single-post-meta-secondary {
+  gap: 0.6rem;
+  font-size: 0.875rem;
+  color: var(--rd-muted);
+}
+
+.page.single .single-post-meta-item i {
+  color: var(--rd-faint);
+}
+
+.page.single .single-post-meta-separator {
+  color: var(--rd-faint);
+  opacity: 0.6;
+}
+
+/* =============================================================================
+   5. 标题锚点: 弱化显示, hover / 键盘聚焦时出现, 不破坏锚点功能
+   ============================================================================= */
+
+.page.single .content .header-mark {
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  margin-right: 0.28em;
+  vertical-align: -0.14em;
+  text-decoration: none;
+  opacity: 0.28;
+  color: var(--rd-muted);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M10 14a4.5 4.5 0 0 0 6.4 0l3.1-3.1a4.5 4.5 0 0 0-6.4-6.4L11.6 6'/%3E%3Cpath d='M14 10a4.5 4.5 0 0 0-6.4 0l-3.1 3.1a4.5 4.5 0 0 0 6.4 6.4L12.4 18'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M10 14a4.5 4.5 0 0 0 6.4 0l3.1-3.1a4.5 4.5 0 0 0-6.4-6.4L11.6 6'/%3E%3Cpath d='M14 10a4.5 4.5 0 0 0-6.4 0l-3.1 3.1a4.5 4.5 0 0 0 6.4 6.4L12.4 18'/%3E%3C/svg%3E");
+  background-color: currentColor;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+// 覆写主题的 "|" / "#" 字符图标
+.page.single .content > h2 > .header-mark::before,
+.page.single .content > h3 > .header-mark::before,
+.page.single .content > h4 > .header-mark::before,
+.page.single .content > h5 > .header-mark::before,
+.page.single .content > h6 > .header-mark::before {
+  content: none !important;
+}
+
+.page.single .content > h2:hover > .header-mark,
+.page.single .content > h3:hover > .header-mark,
+.page.single .content > h4:hover > .header-mark,
+.page.single .content > h5:hover > .header-mark,
+.page.single .content > h6:hover > .header-mark,
+.page.single .content > h2 > .header-mark:focus-visible,
+.page.single .content > h3 > .header-mark:focus-visible,
+.page.single .content > h4 > .header-mark:focus-visible,
+.page.single .content > h5 > .header-mark:focus-visible,
+.page.single .content > h6 > .header-mark:focus-visible {
+  opacity: 1;
+  color: var(--rd-accent);
+}
+
+/* =============================================================================
+   6. 代码
+   ============================================================================= */
+
+// 行内代码: 不再 display: inline-block(会撑高行盒 / 让段落跳动);
+// overflow-wrap: anywhere 让长路径/长符号在窄屏也能断行而不撑破正文列
+.page.single .content code {
+  display: inline;
+  padding: 0.08em 0.34em;
+  border-radius: 4px;
+  font-size: 0.9em;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  background: var(--rd-surface-2);
+  color: #d8a24a;
+}
+
+body[theme="light"] .page.single .content code {
+  color: #b1551a;
+}
+
+.page.single .content .code-block {
+  margin: var(--rd-space-4) 0;
+  border: 1px solid var(--rd-hairline);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.page.single .content .code-block .code-header {
+  border-bottom: 1px solid var(--rd-hairline);
+  font-weight: 500;
+  font-size: 0.8125rem;
+}
+
+.page.single .content pre {
+  margin: 0;
+  padding: 0.85rem 1rem;
+  // 固定为容器宽度, 由内容撑出 scrollWidth 才会出现横向滚动条
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  font-size: 0.875rem;
+  line-height: 1.65;
+}
+
+.page.single .content .code-block .highlight {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+// 关键: 代码块内部不要再保留主题的 min-width:100%.
+// 它会把 <code>/<span.line> 拉成与滚动容器等宽, 内容永远撑不出 scrollWidth,
+// 于是 overflow-x:auto 失效, 长代码行最终把整页撑出横向滚动.
+.page.single .content pre code,
+.page.single .content .code-block .highlight code,
+.page.single .content .code-block .highlight code span.line {
+  display: block;
+  width: max-content;
+  min-width: 0;
+  max-width: none;
+  padding: 0 !important;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+  word-break: normal;
+  overflow-wrap: normal;
+  white-space: pre;
+  tab-size: 4;
+}
+
+/* =============================================================================
+   7. 表格: 窄屏横向滚动, 不撑破页面
+   ============================================================================= */
+
+.page.single .content table {
+  display: block;
+  // fit-content + max-width: 窄表贴合内容宽度, 宽表撑到列宽后横向滚动
+  width: fit-content;
+  min-width: 50%;
+  max-width: 100%;
+  margin: var(--rd-space-4) 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  border: 1px solid var(--rd-hairline);
+  border-radius: 8px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--rd-surface);
+  font-size: 0.9375rem;
+}
+
+.page.single .content table thead {
+  background: var(--rd-surface-2);
+}
+
+.page.single .content table th,
+.page.single .content table td {
+  padding: 0.55rem 0.9rem;
+  border: none;
+  border-bottom: 1px solid var(--rd-hairline);
+  text-align: left;
+  vertical-align: top;
+}
+
+.page.single .content table tr:last-child td,
+.page.single .content table tr:last-child th {
+  border-bottom: none;
+}
+
+.page.single .content table th {
+  color: var(--rd-text-strong);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* =============================================================================
+   8. 图片: 保持原比例 / 不放大 / 不压暗 / 不裁切, 只加边界与前后间距
+   -----------------------------------------------------------------------------
+   主题把正文内容图统一拉成列宽, 小图会被放大. 这里改为:
+     - 默认宽度跟随原图, 即不放大, 保持原始像素尺寸;
+     - 原图比正文列宽时按列宽等比缩小(__rd-img-wide, 由 single-image-hints.js
+       按原图宽度标注), 保证截图细节仍可查看;
+     - 不做任何高度限制、滤镜、亮度或裁切修改, 全部图片保持真实宽高比.
+   ============================================================================= */
+
+.page.single .content img {
+  display: block;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  margin: var(--rd-space-4) auto;
+  // 用 outline 而不是 border 做细边界: 不参与盒模型尺寸,
+  // 图片能被准确渲染为原始像素宽高(不被"放大"2px), 也不引起布局抖动.
+  outline: 1px solid var(--rd-hairline);
+  outline-offset: -1px;
+  border: none;
+  border-radius: 6px;
+  background: var(--rd-surface);
+  box-sizing: border-box;
+  // 覆盖主题 img.lazyloaded { object-fit: contain } 的固定行为, 保持原比例
+  -o-object-fit: contain !important;
+  object-fit: contain !important;
+}
+
+// 原图比正文列更宽: 等比缩到列宽(细节仍可查看, 不裁切)
+.page.single .content img.__rd-img-wide {
+  width: 100%;
+}
+
+.page.single .content a > img {
+  margin-bottom: 0;
+}
+
+.page.single .content figure {
+  margin: var(--rd-space-4) 0;
+  text-align: center;
+}
+
+.page.single .content figure img {
+  margin: var(--rd-space-1) auto;
+}
+
+.page.single .content figure .image-caption:not(:empty),
+.page.single .content figure figcaption {
+  display: block;
+  max-width: 42rem;
+  margin: 0 auto var(--rd-space-1);
+  padding: 0;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--rd-faint);
+}
+
+// lazyload 占位不要产生额外抖动高度
+.page.single .content img.lazyload,
+.page.single .content img.lazyloading {
+  min-height: 0;
+}
+
+// 图片等待 JS 标注 __rd-img-wide 期间先按列宽显示, 避免首屏闪一下大图.
+// (JS 失效时也就是"最大 100% 列宽", 不会溢出)
+.page.single .content img:not(.__rd-img-wide):not(.__rd-img-measured) {
+  max-width: 100%;
+}
+
+/* =============================================================================
+   9. 响应式
+   ============================================================================= */
+
+// 视口不足以同时容纳正文与目录时退化为单列, 目录交给主题的静态折叠目录
+@media only screen and (max-width: 1100px) {
+  .page.single {
+    max-width: calc(var(--rd-content-width) + var(--rd-gutter) * 2);
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .page.single .toc-aside {
+    display: none !important;
+  }
+}
+
+// 中等屏(681px - 1100px): 静态目录卡片收敛视觉噪声
+@media only screen and (min-width: 681px) and (max-width: 1100px) {
+  .page.single #toc-static {
+    margin: var(--rd-space-3) 0 var(--rd-space-4);
+    border: 1px solid var(--rd-hairline);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--rd-surface);
+  }
+
+  .page.single #toc-static .toc-title {
+    padding: 0.6rem 0.95rem;
+    background: transparent;
+    font-size: 0.8125rem;
+    color: var(--rd-muted);
+  }
+
+  .page.single #toc-static .toc-content {
+    background: transparent;
+    font-size: var(--rd-toc-font-size);
+    line-height: var(--rd-toc-line-height);
+  }
+
+  .page.single #toc-static .toc-content > nav > ul {
+    padding: 0.5rem 1rem 0.85rem 1.2rem;
+  }
+
+  .page.single #toc-static .toc-content ul a:first-child::before {
+    content: none !important;
+  }
+}
+
+@media only screen and (max-width: 680px) {
+  :root {
+    --rd-font-size: 1rem;
+    --rd-line-height: 1.8;
+    --rd-space-4: 1.4rem;
+    --rd-space-5: 2rem;
+    --rd-space-6: 2.4rem;
+    --rd-gutter: 1rem;
+  }
+
+  .page.single .single-title {
+    font-size: 1.5rem;
+  }
+
+  .page.single .content > h2 {
+    font-size: 1.3rem;
+  }
+
+  .page.single .content > h3 {
+    font-size: 1.11rem;
+  }
+
+  // 窄屏静态目录: 简洁的折叠入口
+  .page.single #toc-static {
+    margin: var(--rd-space-3) 0 var(--rd-space-4);
+    border: 1px solid var(--rd-hairline);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--rd-surface);
+  }
+
+  .page.single #toc-static .toc-title {
+    padding: 0.6rem 0.85rem;
+    background: transparent;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--rd-muted);
+  }
+
+  .page.single #toc-static .toc-content {
+    background: transparent;
+    font-size: var(--rd-toc-font-size);
+    line-height: var(--rd-toc-line-height);
+  }
+
+  .page.single #toc-static .toc-content > nav > ul {
+    padding: 0.5rem 0.9rem 0.8rem 1.1rem;
+  }
+
+  .page.single #toc-static .toc-content ul a:first-child::before {
+    content: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page.single .content .header-mark,
+  .page.single .toc-content li > a {
+    transition: none;
+  }
+}

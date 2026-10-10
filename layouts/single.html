@@ -1,0 +1,35 @@
+{{- define "title" }}{{ .Title }} - {{ .Site.Title }}{{ end -}}
+
+{{- /*
+    项目级覆盖 themes/LoveIt/layouts/single.html(用于 about 等独立单页)。
+    与 layouts/posts/single.html 保持同一套布局契约:
+      <div class="page single special">  = grid 容器
+        .single-main                     = 第 1 列(标题 / 正文)
+    没有这一层包裹时, 标题与正文会被 grid 自动放进第 1 列, 在宽屏上被挤成
+    860px 居中偏右的窄栏, 表现为"关于页面排版乱了"。
+    页面文字、标题、锚点与原来完全一致, 只增加了一层布局容器。
+*/ -}}
+{{- define "content" -}}
+    {{- $params := .Scratch.Get "params" -}}
+    <div class="page single special">
+        <div class="single-main">
+            {{- /* Title */ -}}
+            <h1 class="single-title animate__animated animate__pulse animate__faster">
+                {{- .Title -}}
+            </h1>
+
+            {{- /* Subtitle */ -}}
+            {{- with $params.subtitle -}}
+                <h2 class="single-subtitle">{{ . }}</h2>
+            {{- end -}}
+
+            {{- /* Content */ -}}
+            <div class="content" id="content">
+                {{- dict "Content" .Content "Ruby" $params.ruby "Fraction" $params.fraction "Fontawesome" $params.fontawesome | partial "function/content.html" | safeHTML -}}
+            </div>
+        </div>
+
+        {{- /* Comment */ -}}
+        {{- partial "comment.html" . -}}
+    </div>
+{{- end -}}

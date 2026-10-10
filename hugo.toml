@@ -507,7 +507,10 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
     # Comment config
     # 评论系统设置
     [params.page.comment]
-      enable = true
+      # 全局关闭评论: false 时主题不会输出 #comments 容器, 也不加载任何评论脚本
+      # (Valine / Gitalk / Waline ... 的配置保留在下面, 便于需要时改回 true)
+      # 注意: 这只是不再显示, 已存在的评论数据仍保存在原有评论后端, 不会被删除
+      enable = false
       # Disqus comment config (https://disqus.com/)
       # Disqus 评论系统设置 (https://disqus.com/)
       [params.page.comment.disqus]
@@ -630,6 +633,10 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
         # Or 或者
         # someJavascript = "https://cdn.example.com/some.js"
         smoothBackToTop = "js/smooth-back-to-top.js"
+        # 文章图片按原图宽度分级(不放大原图窄的图 / 宽图缩到正文列宽)
+        singleImageHints = "js/single-image-hints.js"
+        # 目录 sticky 范围限位, 避免长目录压住文末卡片与评论区
+        singleTocLimit = "js/single-toc-limit.js"
     # Page SEO config
     # 页面 SEO 配置
     [params.page.seo]
@@ -726,7 +733,14 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
     # 位于 "themes/LoveIt/assets/data/cdn/" 目录
     # 可以在你的项目下相同路径存放你自己的数据文件:
     # "assets/data/cdn/"
-    data = "jsdelivr.yml"
+    #
+    # 这里刻意显式置空以关闭 CDN(主题自带的 themes/LoveIt/hugo.toml 里
+    # data = "jsdelivr.yml" 会被合并进来, 所以必须在项目配置里覆盖):
+    # 主题 assets/lib/ 下已内置全部第三方库(Font Awesome / animate.css /
+    # lazysizes / clipboard / lightgallery / valine ...), 关闭 CDN 后这些文件
+    # 随站点一起发布. 之前启用 jsdelivr 时, 一旦 CDN 不可达, Font Awesome
+    # 字体取不到, 头部搜索与主题切换按钮就会变成空白方块。
+    data = ""
 
   # Compatibility config
   # 兼容性设置

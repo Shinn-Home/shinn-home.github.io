@@ -11,73 +11,91 @@
     {{- end -}}
 
     {{- /* Auto TOC */ -}}
-    {{- if ne $toc.enable false -}}
-        <div class="toc" id="toc-auto">
-            <h2 class="toc-title">{{ T "contents" }}</h2>
-            <div class="toc-content{{ if eq $toc.auto false }} always-active{{ end }}" id="toc-content-auto"></div>
-        </div>
-    {{- end -}}
-
+    {{- /*
+        结构说明(文章页布局):
+          <article class="page single">  两列 grid 容器(第 1 列正文 / 第 2 列目录)
+            .single-body                 display: contents, 本身不产生盒子, 只作为
+                                         "正文主体 + 目录" 的语义分组
+              .toc-aside                 grid 第 2 列, 绝对定位容器
+                #toc-auto                sticky 自滚动目录
+              .single-main               grid 第 1 列(标题 / 元信息 / 静态目录 / 正文)
+            .post-bottom-card            通栏, 在目录 sticky 范围之外(由 JS 限位)
+            comment                      通栏
+    */ -}}
     <article class="page single">
-        {{- /* Title */ -}}
-        <h1 class="single-title animate__animated animate__flipInX">{{ .Title | emojify }}</h1>
-
-        {{- /* Subtitle */ -}}
-        {{- with $params.subtitle -}}
-            <h2 class="single-subtitle">{{ . }}</h2>
-        {{- end -}}
-
-        {{- /* Meta */ -}}
-        <div class="single-post-meta-block">
-            <div class="single-post-meta-secondary">
-                <span class="single-post-meta-item">
-                    <i class="far fa-calendar-alt" aria-hidden="true"></i>
-                    <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
-                </span>
-
-                <span class="single-post-meta-separator">·</span>
-
-                <span class="single-post-meta-item">
-                    <i class="far fa-file-alt" aria-hidden="true"></i>
-                    <span>约 {{ .WordCount }} 字</span>
-                </span>
-
-                <span class="single-post-meta-separator">·</span>
-
-                <span class="single-post-meta-item">
-                    <i class="far fa-clock" aria-hidden="true"></i>
-                    <span>预计阅读 {{ .ReadingTime }} 分钟</span>
-                </span>
-            </div>
-        </div>
-
-        {{- /* Featured image */ -}}
-        {{- $image := $params.featuredimage -}}
-        {{- with .Resources.GetMatch "featured-image" -}}
-            {{- $image = .RelPermalink -}}
-        {{- end -}}
-        {{- with $image -}}
-            <div class="featured-image">
-                {{- dict "Src" . "Title" $.Description "Resources" $.Resources | partial "plugin/img.html" -}}
-            </div>
-        {{- end -}}
-
-        {{- /* Static TOC */ -}}
-        {{- if ne $toc.enable false -}}
-            <div class="details toc" id="toc-static"  data-kept="{{ if $toc.keepStatic }}true{{ end }}">
-                <div class="details-summary toc-title">
-                    <span>{{ T "contents" }}</span>
-                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+        <div class="single-body">
+            {{- if ne $toc.enable false -}}
+                <div class="toc-aside">
+                    <div class="toc" id="toc-auto">
+                        <h2 class="toc-title">{{ T "contents" }}</h2>
+                        <div class="toc-content{{ if eq $toc.auto false }} always-active{{ end }}" id="toc-content-auto"></div>
+                    </div>
                 </div>
-                <div class="details-content toc-content" id="toc-content-static">
-                    {{- dict "Content" .TableOfContents "Ruby" $params.ruby "Fraction" $params.fraction "Fontawesome" $params.fontawesome | partial "function/content.html" | safeHTML -}}
+            {{- end -}}
+
+            {{- /* 正文主体(标题 / 元信息 / 静态目录 / 正文)作为第 1 列 */ -}}
+            <div class="single-main">
+            {{- /* Title */ -}}
+            <h1 class="single-title animate__animated animate__flipInX">{{ .Title | emojify }}</h1>
+
+            {{- /* Subtitle */ -}}
+            {{- with $params.subtitle -}}
+                <h2 class="single-subtitle">{{ . }}</h2>
+            {{- end -}}
+
+            {{- /* Meta */ -}}
+            <div class="single-post-meta-block">
+                <div class="single-post-meta-secondary">
+                    <span class="single-post-meta-item">
+                        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+                        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
+                    </span>
+
+                    <span class="single-post-meta-separator">·</span>
+
+                    <span class="single-post-meta-item">
+                        <i class="far fa-file-alt" aria-hidden="true"></i>
+                        <span>约 {{ .WordCount }} 字</span>
+                    </span>
+
+                    <span class="single-post-meta-separator">·</span>
+
+                    <span class="single-post-meta-item">
+                        <i class="far fa-clock" aria-hidden="true"></i>
+                        <span>预计阅读 {{ .ReadingTime }} 分钟</span>
+                    </span>
                 </div>
             </div>
-        {{- end -}}
 
-        {{- /* Content */ -}}
-        <div class="content" id="content">
-            {{- dict "Content" .Content "Ruby" $params.ruby "Fraction" $params.fraction "Fontawesome" $params.fontawesome | partial "function/content.html" | safeHTML -}}
+            {{- /* Featured image */ -}}
+            {{- $image := $params.featuredimage -}}
+            {{- with .Resources.GetMatch "featured-image" -}}
+                {{- $image = .RelPermalink -}}
+            {{- end -}}
+            {{- with $image -}}
+                <div class="featured-image">
+                    {{- dict "Src" . "Title" $.Description "Resources" $.Resources | partial "plugin/img.html" -}}
+                </div>
+            {{- end -}}
+
+            {{- /* Static TOC */ -}}
+            {{- if ne $toc.enable false -}}
+                <div class="details toc" id="toc-static"  data-kept="{{ if $toc.keepStatic }}true{{ end }}">
+                    <div class="details-summary toc-title">
+                        <span>{{ T "contents" }}</span>
+                        <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                    </div>
+                    <div class="details-content toc-content" id="toc-content-static">
+                        {{- dict "Content" .TableOfContents "Ruby" $params.ruby "Fraction" $params.fraction "Fontawesome" $params.fontawesome | partial "function/content.html" | safeHTML -}}
+                    </div>
+                </div>
+            {{- end -}}
+
+            {{- /* Content */ -}}
+            <div class="content" id="content">
+                {{- dict "Content" .Content "Ruby" $params.ruby "Fraction" $params.fraction "Fontawesome" $params.fontawesome | partial "function/content.html" | safeHTML -}}
+            </div>
+            </div>
         </div>
 
         {{- /* Footer */ -}}

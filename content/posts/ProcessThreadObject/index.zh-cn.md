@@ -57,20 +57,20 @@ lightgallery: true
 
 1. 线程对象也区分出了`ETHREAD`、`KTHREAD`
 
-| KTHREAD字段                           | 定义                                                     |
-| ------------------------------------- | -------------------------------------------------------- |
-| _DISPATCH_HEADER分发头                | 线程是可等待对象                                         |
-| InitialStack、StackLimit、KernelStack | 当前线程的栈底、栈顶、内核栈                             |
-| Alerted                               | 线程可提前唤醒                                           |
-| Teb                                   | 线程环境快                                               |
-| TrapFrame                             | 线程从R3进入R0时，保存寄存器环境                         |
-| ApcState、SavedApcState               | 跟APC调度相关，后续章节会详细展开                        |
-| State                                 | 线程状态：运行中、就绪（在就绪链表）、等待（等待被调度） |
-| BasePriority                          | 当前线程优先级                                           |
-| PreviousMode                          | 当前线程的先前模式                                       |
-| ThreadListEntry                       | 链接同进程下其他的线程                                   |
-| Process                               | 当前线程所属进程对象                                     |
-| WaitListEntry                         | 当前线程被挂到等待链表中时，就是靠这个来挂的             |
+| KTHREAD字段                           | 定义                                                       |
+| ------------------------------------- | ---------------------------------------------------------- |
+| _DISPATCH_HEADER分发头                | 线程是可等待对象                                           |
+| InitialStack、StackLimit、KernelStack | 当前线程的栈底、栈顶、内核栈                               |
+| Alerted                               | 线程可提前唤醒                                             |
+| Teb                                   | 线程环境快                                                 |
+| TrapFrame                             | 线程从R3进入R0时，保存寄存器环境                           |
+| ApcState、SavedApcState               | 跟APC调度相关，后续章节会详细展开                          |
+| State                                 | 线程状态：运行中、就绪（在就绪链表）、等待（等待同步对象） |
+| BasePriority                          | 当前线程优先级                                             |
+| PreviousMode                          | 当前线程的先前模式                                         |
+| ThreadListEntry                       | 链接同进程下其他的线程                                     |
+| Process                               | 当前线程所属进程对象                                       |
+| WaitListEntry                         | 当前线程被挂到等待链表中时，就是靠这个来挂的               |
 
 | ETHREAD字段             | 定义                                                         |
 | ----------------------- | ------------------------------------------------------------ |
