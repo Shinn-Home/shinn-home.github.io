@@ -594,3 +594,72 @@ body[theme="light"] .post-bottom-nav-item.is-disabled .post-bottom-nav-empty {
     scroll-behavior: auto;
   }
 }
+
+// ==============================
+// 首页统计栏: 位于个人简介与文章列表之间
+// 极简横向布局, 无卡片/背景/阴影, 仅用细竖线分隔
+// ==============================
+.home-stats {
+  // 暗色为默认取值 (与站点 defaultTheme = "dark" 一致)
+  --home-stat-label-color: rgba(210, 215, 225, 0.58);
+  --home-stat-value-color: rgba(107, 220, 255, 0.88);
+  --home-stat-divider-color: rgba(255, 255, 255, 0.09);
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  row-gap: 0.3rem;
+  margin: 1rem 0 0.2rem;
+}
+
+body[theme="light"] .home-stats {
+  --home-stat-label-color: rgba(71, 85, 105, 0.75);
+  --home-stat-value-color: #3b82f6;
+  --home-stat-divider-color: rgba(15, 23, 42, 0.1);
+}
+
+.home-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  padding: 0 1.5rem;
+  line-height: 1.4;
+}
+
+.home-stat + .home-stat {
+  border-left: 1px solid var(--home-stat-divider-color);
+}
+
+.home-stat-label {
+  font-size: 0.84rem;
+  color: var(--home-stat-label-color);
+  white-space: nowrap;
+}
+
+.home-stat-value {
+  font-size: 1.12rem;
+  font-weight: 600;
+  color: var(--home-stat-value-color);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+// 窄屏: 收紧间距并去掉竖线, 允许换行, 避免重叠或溢出
+@media (max-width: 560px) {
+  .home-stat {
+    padding: 0 0.85rem;
+  }
+
+  .home-stat + .home-stat {
+    border-left: none;
+  }
+
+  .home-stat-label {
+    font-size: 0.8rem;
+  }
+
+  .home-stat-value {
+    font-size: 1.02rem;
+  }
+}

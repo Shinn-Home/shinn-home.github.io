@@ -1,0 +1,42 @@
+{{- /*
+    首页统计栏: 文章数 / 首篇文章日期。
+    文章集合与 home.html 文章列表使用同一套筛选逻辑, 保证统计口径一致:
+      - 只统计 Type = "posts" 的正式文章 (关于/分类/标签等页面天然被排除)
+      - hiddenFromHomePage 的文章不计入, 与首页列表可见性保持一致
+      - 草稿和未来发布的文章默认不参与构建, 不会出现在 .Site.RegularPages 中
+    没有可统计的文章时整个统计栏不输出, 不会导致构建失败。
+*/ -}}
+{{- $pages := where .Site.RegularPages "Type" "posts" -}}
+{{- if .Site.Params.page.hiddenFromHomePage -}}
+    {{- $pages = where $pages "Params.hiddenfromhomepage" false -}}
+{{- else -}}
+    {{- $pages = where $pages "Params.hiddenfromhomepage" "!=" true -}}
+{{- end -}}
+
+{{- $count := len $pages -}}
+{{- if gt $count 0 -}}
+    {{- /* 首篇文章日期: 按日期升序找第一篇日期有效 (非零值) 的文章, 按站点配置的日期格式展示 */ -}}
+    {{- $hasFirst := false -}}
+    {{- $firstDate := now -}}
+    {{- range $pages.ByDate -}}
+        {{- if not .Date.IsZero -}}
+            {{- $firstDate = .Date -}}
+            {{- $hasFirst = true -}}
+            {{- break -}}
+        {{- end -}}
+    {{- end -}}
+
+    <div class="home-stats" aria-label="站点统计">
+        <div class="home-stat">
+            <span class="home-stat-label">文章数</span>
+            <span class="home-stat-value">{{ lang.FormatNumber 0 $count }}</span>
+        </div>
+        {{- if $hasFirst -}}
+            {{- $dateFormat := .Site.Params.dateFormat | default "2006-01-02" -}}
+            <div class="home-stat">
+                <span class="home-stat-label">首篇文章</span>
+                <span class="home-stat-value">{{ dateFormat $dateFormat $firstDate }}</span>
+            </div>
+        {{- end -}}
+    </div>
+{{- end -}}
