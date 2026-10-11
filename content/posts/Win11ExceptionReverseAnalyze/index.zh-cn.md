@@ -5,7 +5,7 @@ lastmod: 2026-09-11T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
-tags: [ "Windows内核", "异常体系分析", "无痕Hook", "反调试", "进程保护", "reverse engineering", ]
+tags: ["Windows内核", "异常体系分析", "逆向工程", "无痕Hook", "反调试", "进程保护"]
 categories: ["Security Research"]
 
 twemoji: false

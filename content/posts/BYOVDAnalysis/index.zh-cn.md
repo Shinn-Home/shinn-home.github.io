@@ -1,11 +1,11 @@
 ---
-title: "BYOVD漏洞驱动分析"
+title: "BYOVD漏洞驱动分析思路"
 date: 2025-06-13T12:00:00+08:00
 lastmod: 2025-06-13T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
-tags: ["BYOVD", "漏洞驱动", "提权", "Windows内核"]
+tags: ["BYOVD", "提权", "逆向工程", "Windows内核"]
 categories: ["Security Research"]
 
 twemoji: false

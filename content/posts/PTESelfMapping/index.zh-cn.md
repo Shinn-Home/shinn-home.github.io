@@ -5,7 +5,7 @@ lastmod: 2021-08-18T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
-tags: ["PTE", "PTE自映射", "分页保护模式", "内存管理", "Windows内核"]
+tags: ["内存管理", "Windows内核"]
 categories: ["Windows内核分析与逆向"]
 
 twemoji: false

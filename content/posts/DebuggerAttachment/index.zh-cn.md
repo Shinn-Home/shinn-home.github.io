@@ -5,7 +5,7 @@ lastmod: 2022-06-03T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
-tags: ["调试体系", "DebugPort", "调试事件", "Windows内核"]
+tags: ["内核调试", "Windows内核"]
 categories: ["Windows内核分析与逆向"]
 
 twemoji: false

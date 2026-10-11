@@ -5,7 +5,7 @@ lastmod: 2021-07-26T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
-tags: ["保护模式", "x86汇编", "Windows内核", "段寄存器", "GDT"]
+tags: ["保护模式", "x86汇编", "Windows内核"]
 categories: ["Windows内核分析与逆向"]
 
 twemoji: false

@@ -5,7 +5,7 @@ lastmod: 2022-03-07T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
-tags: ["监控回调", "线程创建回调", "PspCreateThreadNotifyRoutine", "Windows内核"]
+tags: ["监控回调", "Windows内核"]
 categories: ["Windows内核分析与逆向"]
 
 twemoji: false

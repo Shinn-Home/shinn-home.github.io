@@ -5,7 +5,7 @@ lastmod: 2022-04-02T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
-tags: ["监控回调", "Ob回调", "进程保护", "Windows内核"]
+tags: ["监控回调", "进程保护", "Windows内核"]
 categories: ["Windows内核分析与逆向"]
 
 twemoji: false

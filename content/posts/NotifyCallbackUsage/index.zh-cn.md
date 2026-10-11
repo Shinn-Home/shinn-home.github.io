@@ -5,7 +5,7 @@ lastmod: 2022-03-12T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
-tags: ["监控回调", "PspNotifyEnableMask", "回调屏蔽", "Windows内核"]
+tags: ["监控回调", "Windows内核"]
 categories: ["Windows内核分析与逆向"]
 
 twemoji: false

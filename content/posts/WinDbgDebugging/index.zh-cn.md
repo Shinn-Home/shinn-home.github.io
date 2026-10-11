@@ -5,7 +5,7 @@ lastmod: 2021-07-21T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
-tags: ["WinDbg", "内核调试", "Windows内核", "reverse engineering"]
+tags: ["内核调试", "逆向工程", "Windows内核"]
 categories: ["软件调试、反调试"]
 
 twemoji: false

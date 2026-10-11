@@ -5,7 +5,7 @@ lastmod: 2021-08-29T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
-tags: ["物理内存", "MmPfnDataBase", "内存管理", "扫描内存", "Windows内核"]
+tags: ["内存管理", "内存扫描", "Windows内核"]
 categories: ["Windows内核分析与逆向"]
 
 twemoji: false

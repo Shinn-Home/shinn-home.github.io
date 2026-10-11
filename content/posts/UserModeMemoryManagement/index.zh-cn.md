@@ -5,7 +5,7 @@ lastmod: 2021-09-18T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
-tags: ["VAD", "用户态内存", "内存管理", "扫描内存", "Windows内核"]
+tags: ["内存管理", "内存扫描", "Windows内核"]
 categories: ["Windows内核分析与逆向"]
 
 twemoji: false

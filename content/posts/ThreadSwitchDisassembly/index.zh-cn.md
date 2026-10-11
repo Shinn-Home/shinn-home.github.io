@@ -5,7 +5,7 @@ lastmod: 2021-12-03T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
-tags: ["线程切换", "反汇编分析", "KiSwapThread", "reverse engineering", "Windows内核"]
+tags: ["进程与线程", "逆向工程", "Windows内核"]
 categories: ["Windows内核分析与逆向"]
 
 twemoji: false

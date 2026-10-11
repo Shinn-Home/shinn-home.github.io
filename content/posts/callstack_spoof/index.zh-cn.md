@@ -5,7 +5,7 @@ lastmod: 2026-03-21T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
-tags: ["Windows内核", "堆栈混淆", "stack spoofing", "reverse engineering"]
+tags: ["Windows内核", "堆栈伪造", "逆向工程"]
 categories: ["Security Research"]
 
 twemoji: false

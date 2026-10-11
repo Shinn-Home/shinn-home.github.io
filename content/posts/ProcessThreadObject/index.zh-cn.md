@@ -5,7 +5,7 @@ lastmod: 2021-11-14T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
-tags: ["EPROCESS", "ETHREAD", "进程与线程", "内核对象", "Windows内核"]
+tags: ["进程与线程", "内核对象", "Windows内核"]
 categories: ["Windows内核分析与逆向"]
 
 twemoji: false

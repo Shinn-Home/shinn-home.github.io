@@ -5,7 +5,7 @@ lastmod: 2022-04-26T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
-tags: ["异常体系分析", "KiDispatchException", "内核异常", "Windows内核"]
+tags: ["异常体系分析", "Windows内核"]
 categories: ["Windows内核分析与逆向"]
 
 twemoji: false

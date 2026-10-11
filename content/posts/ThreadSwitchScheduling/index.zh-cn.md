@@ -5,7 +5,7 @@ lastmod: 2021-11-21T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
-tags: ["线程切换", "线程调度", "上下文切换", "KPCR", "Windows内核"]
+tags: ["进程与线程", "Windows内核"]
 categories: ["Windows内核分析与逆向"]
 
 twemoji: false

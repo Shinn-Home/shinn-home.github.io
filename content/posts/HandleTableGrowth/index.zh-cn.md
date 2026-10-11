@@ -5,7 +5,7 @@ lastmod: 2022-01-21T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
-tags: ["句柄表", "句柄表动态增长", "内核对象", "Windows内核"]
+tags: ["句柄表", "Windows内核"]
 categories: ["Windows内核分析与逆向"]
 
 twemoji: false

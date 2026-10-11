@@ -5,7 +5,7 @@ lastmod: 2022-04-11T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
-tags: ["APC", "KAPC", "KeInsertQueueApc", "ApcState", "Windows内核"]
+tags: ["APC", "Windows内核"]
 categories: ["Windows内核分析与逆向"]
 
 twemoji: false

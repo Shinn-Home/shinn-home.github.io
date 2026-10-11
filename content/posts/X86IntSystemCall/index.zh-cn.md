@@ -5,7 +5,7 @@ lastmod: 2021-10-02T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
-tags: ["系统调用", "中断门", "Int 2E", "SSDT", "Windows内核"]
+tags: ["系统调用", "Windows内核"]
 categories: ["Windows内核分析与逆向"]
 
 twemoji: false

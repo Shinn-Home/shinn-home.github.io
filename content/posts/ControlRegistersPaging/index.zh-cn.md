@@ -5,7 +5,7 @@ lastmod: 2021-08-08T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
-tags: ["控制寄存器", "分页保护模式", "CR3", "PAE", "TLB", "Windows内核"]
+tags: ["保护模式", "内存管理", "Windows内核"]
 categories: ["Windows内核分析与逆向"]
 
 twemoji: false
