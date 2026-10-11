@@ -1,10 +1,7 @@
 # 👋Hi there, I’m @__Shinn
 
-I'm a Windows Kernel Driver Engineer focused on low-level systems development.
+Windows Kernel Developer focused on **Game Security**, **Anti-Cheat**, and **Kernel Defense**.
 
 ## About Me
-- 💻 Specialized in Windows kernel driver development
+- 💻 Windows kernel driver development for game security and anti-cheat
 - 🛡️ Interested in kernel defense and kernel security
-- 🎮 Exploring game anti-cheat technologies
-- 🔍 Passionate about reverse engineering and engine internals
-- ⚙️ Enjoy building low-level tools and researching system mechanisms

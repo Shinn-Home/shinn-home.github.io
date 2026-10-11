@@ -16,9 +16,15 @@
     {{- with .Params.tags -}}
         <div class="post-bottom-tags">
             {{- range . -}}
-                {{- $tagPath := partialCached "function/path.html" . . -}}
-                {{- $tagPage := printf "/tags/%v" $tagPath | $.Site.GetPage -}}
-                {{- $tagHref := printf "/tags/%v/" $tagPath | relLangURL -}}
+                {{- /* 先按标签原始名(term key)查找, 失败再退回 urlize 路径查找,
+                    与 _default/summary.html 的分类查找保持同一策略 */ -}}
+                {{- $tagPage := printf "/tags/%v" . | $.Site.GetPage -}}
+                {{- $tagHref := "" -}}
+                {{- if not $tagPage -}}
+                    {{- $tagPath := partialCached "function/path.html" . . -}}
+                    {{- $tagHref = printf "/tags/%v/" $tagPath | relLangURL -}}
+                    {{- $tagPage = printf "/tags/%v" $tagPath | $.Site.GetPage -}}
+                {{- end -}}
                 {{- with $tagPage -}}
                     <a class="post-bottom-tag" href="{{ .RelPermalink }}">
                         <i class="fas fa-tag post-bottom-tag-icon" aria-hidden="true"></i>

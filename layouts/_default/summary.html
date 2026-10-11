@@ -4,8 +4,14 @@
 
 {{- with .Params.categories -}}
     {{- range . -}}
-        {{- $categoryPath := partialCached "function/path.html" . . -}}
-        {{- $categoryPage := printf "/categories/%v" $categoryPath | $.Site.GetPage -}}
+        {{- /* GetPage 按分类原始名(term key)匹配; 含顿号等标点的分类名经
+              function/path.html 的 urlize 处理后字符被删除, 按路径查找会失配,
+              因此先用原始名查找, 失败再退回 urlize 路径查找 */ -}}
+        {{- $categoryPage := printf "/categories/%v" . | $.Site.GetPage -}}
+        {{- if not $categoryPage -}}
+            {{- $categoryPath := partialCached "function/path.html" . . -}}
+            {{- $categoryPage = printf "/categories/%v" $categoryPath | $.Site.GetPage -}}
+        {{- end -}}
         {{- if $categoryPage -}}
             {{- $categories = $categories | append (printf `<a class="home-post-category-link" href="%v">%v</a>` $categoryPage.RelPermalink $categoryPage.Title) -}}
         {{- else -}}
