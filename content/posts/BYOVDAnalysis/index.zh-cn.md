@@ -1,7 +1,7 @@
 ---
 title: "BYOVD漏洞驱动分析思路"
-date: 2025-06-13T12:00:00+08:00
-lastmod: 2025-06-13T12:00:00+08:00
+date: 2025-01-13T12:00:00+08:00
+lastmod: 2025-01-13T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
