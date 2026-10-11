@@ -6,7 +6,7 @@ draft: false
 author: "Shinn"
 images: []
 tags: ["线程切换", "线程调度", "上下文切换", "KPCR", "Windows内核"]
-categories: ["Windows内核分析"]
+categories: ["Windows内核分析与逆向"]
 
 twemoji: false
 lightgallery: true

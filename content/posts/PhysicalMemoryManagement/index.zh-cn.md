@@ -6,7 +6,7 @@ draft: false
 author: "Shinn"
 images: []
 tags: ["物理内存", "MmPfnDataBase", "内存管理", "扫描内存", "Windows内核"]
-categories: ["Windows内核分析"]
+categories: ["Windows内核分析与逆向"]
 
 twemoji: false
 lightgallery: true

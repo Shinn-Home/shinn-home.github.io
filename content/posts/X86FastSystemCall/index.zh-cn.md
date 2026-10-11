@@ -6,7 +6,7 @@ draft: false
 author: "Shinn"
 images: []
 tags: ["系统调用", "快速系统调用", "sysenter", "MSR", "Windows内核"]
-categories: ["Windows内核分析"]
+categories: ["Windows内核分析与逆向"]
 
 twemoji: false
 lightgallery: true

@@ -6,7 +6,7 @@ draft: false
 author: "Shinn"
 images: []
 tags: ["监控回调", "Ob回调", "进程保护", "Windows内核"]
-categories: ["Windows内核分析"]
+categories: ["Windows内核分析与逆向"]
 
 twemoji: false
 lightgallery: true

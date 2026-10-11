@@ -6,7 +6,7 @@ draft: false
 author: "Shinn"
 images: []
 tags: ["APC", "KAPC", "KeInsertQueueApc", "ApcState", "Windows内核"]
-categories: ["Windows内核分析"]
+categories: ["Windows内核分析与逆向"]
 
 twemoji: false
 lightgallery: true

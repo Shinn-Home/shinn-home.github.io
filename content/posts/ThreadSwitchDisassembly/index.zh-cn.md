@@ -6,7 +6,7 @@ draft: false
 author: "Shinn"
 images: []
 tags: ["线程切换", "反汇编分析", "KiSwapThread", "reverse engineering", "Windows内核"]
-categories: ["Windows内核分析"]
+categories: ["Windows内核分析与逆向"]
 
 twemoji: false
 lightgallery: true

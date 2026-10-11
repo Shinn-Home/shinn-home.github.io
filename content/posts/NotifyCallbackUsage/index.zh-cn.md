@@ -6,7 +6,7 @@ draft: false
 author: "Shinn"
 images: []
 tags: ["监控回调", "PspNotifyEnableMask", "回调屏蔽", "Windows内核"]
-categories: ["Windows内核分析"]
+categories: ["Windows内核分析与逆向"]
 
 twemoji: false
 lightgallery: true

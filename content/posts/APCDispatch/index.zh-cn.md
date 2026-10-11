@@ -6,7 +6,7 @@ draft: false
 author: "Shinn"
 images: []
 tags: ["APC", "KiDeliverApc", "用户APC", "内核APC", "Windows内核"]
-categories: ["Windows内核分析"]
+categories: ["Windows内核分析与逆向"]
 
 twemoji: false
 lightgallery: true

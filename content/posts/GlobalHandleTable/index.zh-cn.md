@@ -6,7 +6,7 @@ draft: false
 author: "Shinn"
 images: []
 tags: ["句柄表", "全局句柄表", "PspCidTable", "EPROCESS", "Windows内核"]
-categories: ["Windows内核分析"]
+categories: ["Windows内核分析与逆向"]
 
 twemoji: false
 lightgallery: true

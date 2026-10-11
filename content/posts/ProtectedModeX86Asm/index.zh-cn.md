@@ -6,7 +6,7 @@ draft: false
 author: "Shinn"
 images: []
 tags: ["保护模式", "x86汇编", "Windows内核", "段寄存器", "GDT"]
-categories: ["Windows内核分析"]
+categories: ["Windows内核分析与逆向"]
 
 twemoji: false
 lightgallery: true

@@ -6,7 +6,7 @@ draft: false
 author: "Shinn"
 images: []
 tags: ["EPROCESS", "ETHREAD", "进程与线程", "内核对象", "Windows内核"]
-categories: ["Windows内核分析"]
+categories: ["Windows内核分析与逆向"]
 
 twemoji: false
 lightgallery: true

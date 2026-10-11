@@ -6,7 +6,7 @@ draft: false
 author: "Shinn"
 images: []
 tags: ["WinDbg", "内核调试", "Windows内核", "reverse engineering"]
-categories: ["调试/分析技术"]
+categories: ["软件调试、反调试"]
 
 twemoji: false
 lightgallery: true

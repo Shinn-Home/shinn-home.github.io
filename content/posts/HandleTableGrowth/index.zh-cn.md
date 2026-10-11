@@ -6,7 +6,7 @@ draft: false
 author: "Shinn"
 images: []
 tags: ["句柄表", "句柄表动态增长", "内核对象", "Windows内核"]
-categories: ["Windows内核分析"]
+categories: ["Windows内核分析与逆向"]
 
 twemoji: false
 lightgallery: true

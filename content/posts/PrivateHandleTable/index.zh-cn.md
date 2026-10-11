@@ -6,7 +6,7 @@ draft: false
 author: "Shinn"
 images: []
 tags: ["句柄表", "私有句柄表", "OBJECT_HEADER", "OBJECT_TYPE", "Windows内核"]
-categories: ["Windows内核分析"]
+categories: ["Windows内核分析与逆向"]
 
 twemoji: false
 lightgallery: true

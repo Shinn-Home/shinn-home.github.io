@@ -6,7 +6,7 @@ draft: false
 author: "Shinn"
 images: []
 tags: ["PTE", "PTE自映射", "分页保护模式", "内存管理", "Windows内核"]
-categories: ["Windows内核分析"]
+categories: ["Windows内核分析与逆向"]
 
 twemoji: false
 lightgallery: true
