@@ -217,11 +217,3 @@ VOID Cheat::MagicBullet(APlayerCameraManager* PlayerCameraManager)
 	}
 }
 ```
-
-
-
-## 注入代码后开启魔法世界
-
-![1](Image/1.gif)
-
-![1](Image/2.gif)
