@@ -14,7 +14,7 @@ lightgallery: true
 
 <!--more-->
 
-## 八宝粥7-31加密分析
+## 八宝粥OwningGameInstance加密分析
 
 ```c++
 // rax返回值为OwningGameInstance

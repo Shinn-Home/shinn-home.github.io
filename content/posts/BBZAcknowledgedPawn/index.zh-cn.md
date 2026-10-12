@@ -14,7 +14,7 @@ lightgallery: true
 
 <!--more-->
 
-## 八宝粥8-7加密分析
+## 八宝粥AcknowledgedPawn加密分析
 
 ### 解密方法1：Hook实现解密
 
