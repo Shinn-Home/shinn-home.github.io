@@ -1,7 +1,7 @@
 ---
-title: "八宝粥行动逆向笔记：AcknowledgedPawn加密分析"
-date: 2025-06-24T12:00:00+08:00
-lastmod: 2025-06-24T12:00:00+08:00
+title: "八宝粥行动逆向笔记：AcknowledgedPawn、OwningGameInstance加密分析"
+date: 2025-06-22T12:00:00+08:00
+lastmod: 2025-06-22T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
@@ -13,6 +13,8 @@ lightgallery: true
 ---
 
 <!--more-->
+
+八宝粥对部分UE指针成员（如AcknowledgedPawn、OwningGameInstance）采用了同一套加密方案：成员保存的是密文，解密时以成员偏移对应的函数索引为下标，从解密函数表中取出解密Call，用其返回的XorKey与密文异或得到明文指针。本文记录AcknowledgedPawn与OwningGameInstance两处指针的解密分析过程。
 
 ## 八宝粥AcknowledgedPawn加密分析
 
@@ -65,3 +67,33 @@ if ( Enc_AcknowledgedPawn )
     }
 // .....
 ```
+
+## 八宝粥OwningGameInstance加密分析
+
+```c++
+// rax返回值为OwningGameInstance
+// 参数1为GWorld
+__int64 __fastcall sub_14092C390(__int64 a1)
+{
+  __int64 v1; // rbx
+  unsigned int v3; // ecx
+  int v4; // eax
+  unsigned int v5; // ecx
+
+  v1 = *(_QWORD *)(a1 + 0x1B8);
+  if ( !v1 )
+    return 0i64;
+  v3 = *(_DWORD *)(a1 + 0x1C0);
+  if ( v3 >= 0x20 )
+    return v1;
+  v4 = dword_152F4B484;
+  if ( !_bittest(&v4, v3) )
+    return v1;
+  v5 = dword_152F4B480 + v3;
+  if ( v5 >= 0xC9 )
+    v5 = 200;
+  return v1 ^ ((__int64 (__fastcall *)(_QWORD))funcs_14092C3E3[v5])((unsigned int)dword_152F4B488);
+}
+```
+
+可以看到，OwningGameInstance的解密流程与AcknowledgedPawn一致：同样是“函数索引表 + 解密Call返回XorKey + 异或”的方案，只是成员偏移和解密函数表的全局地址不同。

@@ -1,5 +1,5 @@
 ---
-title: "八宝粥行动逆向笔记：UWorld、UEngine加密分析"
+title: "八宝粥行动逆向笔记：UWorld、UEngine、GName加密分析及GObject分析"
 date: 2025-06-09T12:00:00+08:00
 lastmod: 2025-06-09T12:00:00+08:00
 draft: false
@@ -14,7 +14,7 @@ lightgallery: true
 
 <!--more-->
 
-## BBZ加密分析
+## UWorld、UEngine加密分析
 
 
 ### GWorld加密
@@ -339,4 +339,302 @@ LABEL_26:
     return 0i64;
   }
 }
+```
+
+## GName加密分析
+
+通过字符串定位（Ansi）
+
+```c
+"ByteProperty"
+```
+
+搜索到引用函数后，再交叉引用即可
+
+```c
+if ( byte_154A8182C )
+{
+    v4 = &unk_154A81B00;
+}
+else
+{
+    v4 = (_QWORD *)sub_14AEA1CE0((__int64)&unk_154A81B00);	// GName = 154A81B00
+    byte_154A8182C = 1;									 // 全局初始化标志位
+}
+v5 = (_WORD *)(v4[v3 + 1] + (unsigned int)(2 * v12));
+v6 = v5 + 1;
+v7 = (unsigned __int64)(unsigned __int16)*v5 >> 6;
+if ( (*v5 & 1) != 0 )	// FNAME_ENTRY.bIsWide
+{
+    v8 = v7;
+    sub_14E327C7D(v13, v6, 2 * v7);	// memcpy
+    sub_14AEABF60(v13, (unsigned __int16)*v5 >> 6);// WideChar解密
+    if ( (unsigned int)sub_14AD5CEE0(v13, a2, v7) )
+        return 0;
+    v9 = a2[v8];
+    if ( !v14 )
+        return v9 == 0;
+    return v9 == 95 && (unsigned __int8)sub_14AEA0F40((unsigned int)(v14 - 1), &a2[v8 + 1]);
+}
+else
+{
+    sub_14E327C7D(v13, v6, (unsigned __int64)(unsigned __int16)*v5 >> 6);// memcpy
+    sub_14AEABD50(v13, (unsigned __int16)*v5 >> 6);// Ansi解密
+    if ( (unsigned int)sub_14AD5CE60(v13, a2, v7) )
+        return 0;
+    v11 = a2[v7];
+    if ( !v14 )
+        return v11 == 0;
+    return v11 == 95 && (unsigned __int8)sub_14AEA0F40((unsigned int)(v14 - 1), &a2[v7 + 1]);
+}
+```
+
+### 特征码
+
+1. GName特征码
+
+```c
+"48 8D 15 ?? ?? ?? ?? EB ?? 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B D0 C6 05 ?? ?? ?? ?? 01"
+```
+
+```c
+DeltaForce_20260626_Ansi.exe+1528E3CB - 48 8D 15 EE96A90B     - lea rdx,[DeltaForce_20260626_Ansi.exe+20D27AC0]		// GName
+DeltaForce_20260626_Ansi.exe+1528E3D2 - EB 16                 - jmp DeltaForce_20260626_Ansi.exe+1528E3EA
+DeltaForce_20260626_Ansi.exe+1528E3D4 - 48 8D 0D E596A90B     - lea rcx,[DeltaForce_20260626_Ansi.exe+20D27AC0]		// GName
+DeltaForce_20260626_Ansi.exe+1528E3DB - E8 F0130000           - call DeltaForce_20260626_Ansi.exe+1528F7D0
+DeltaForce_20260626_Ansi.exe+1528E3E0 - 48 8B D0              - mov rdx,rax
+DeltaForce_20260626_Ansi.exe+1528E3E3 - C6 05 1295A90B 01     - mov byte ptr [DeltaForce_20260626_Ansi.exe+20D278FC],01
+DeltaForce_20260626_Ansi.exe+1528E3EA - 48 8B 44 24 20        - mov rax,[rsp+20]
+```
+
+2. 解密特征码
+
+```c
+"E8 ?? ?? ?? ?? 0F B7 16 48 8D 4C 24 ?? C1 EA ?? E8 ?? ?? ?? ?? 4C 8B C7 48 8D 4C 24 ?? 48 8B D3 E8"
+```
+
+```c
+DeltaForce_20260626_Ansi.exe+1528E415 - E8 337AAF03           - call DeltaForce_20260626_Ansi.exe+18D85E4D
+DeltaForce_20260626_Ansi.exe+1528E41A - 0FB7 16               - movzx edx,word ptr [rsi]
+DeltaForce_20260626_Ansi.exe+1528E41D - 48 8D 4C 24 30        - lea rcx,[rsp+30]
+DeltaForce_20260626_Ansi.exe+1528E422 - C1 EA 06              - shr edx,06
+DeltaForce_20260626_Ansi.exe+1528E425 - E8 066D0000           - call DeltaForce_20260626_Ansi.exe+15295130	// WideChar解密Call
+```
+
+## GObject
+
+IDA搜索字符串（Ansi）
+
+```c
+"UObjectBaseInit"
+```
+
+搜索到引用后，直接转伪代码
+
+```c
+__int64 sub_14B217330()
+{
+  int v0; // edi
+  __int64 v1; // rax
+  __int64 v2; // r9
+  __int64 v3; // rax
+  const wchar_t *v4; // rcx
+  __int64 v5; // rax
+  unsigned int v6; // ebx
+  char v7; // si
+  int v8; // ebx
+  unsigned __int128 v9; // rax
+  __int64 v10; // rbx
+  unsigned __int128 v11; // rax
+  __int64 v12; // rax
+  __int64 v13; // rsi
+  __int64 v14; // rcx
+  int v15; // eax
+  __int64 v16; // rbx
+  int v17; // eax
+  int v18; // ebx
+  int v20; // [rsp+50h] [rbp-30h] BYREF
+  __int64 v21[2]; // [rsp+58h] [rbp-28h] BYREF
+  char v22[24]; // [rsp+68h] [rbp-18h] BYREF
+  char v23; // [rsp+B0h] [rbp+30h] BYREF
+  char v24; // [rsp+B8h] [rbp+38h] BYREF
+  int v25; // [rsp+C0h] [rbp+40h] BYREF
+  int v26; // [rsp+C8h] [rbp+48h] BYREF
+
+  sub_14092DD90(v22, "UObjectBaseInit");
+  v0 = 0;
+  v20 = 0;
+  v25 = 0;
+  v23 = 0;
+  v24 = 0;
+  v26 = 0x200000;
+  sub_14AE1B0B0(
+    qword_154A73948,
+    (unsigned int)L"/Script/Engine.GarbageCollectionSettings",
+    (unsigned int)L"gc.EnabledGCOffsetByPC",
+    (unsigned int)&v24,
+    (__int64)&unk_154A7DD08);
+  byte_154A9AFF4 = v24;
+  v21[0] = 0i64;
+  v21[1] = 0i64;
+  v1 = sub_14AE1AA80();
+  LOBYTE(v2) = 1;
+  if ( (unsigned __int8)sub_14AE85600(v1, L"-filehostip=", v21, v2) )
+  {
+    dword_153FA8E48 = 0;
+  }
+  else
+  {
+    sub_14AE1C7B0(
+      qword_154A73948,
+      (unsigned int)L"/Script/Engine.GarbageCollectionSettings",
+      (unsigned int)L"gc.MaxObjectsNotConsideredByGC",
+      (unsigned int)&v20,
+      (__int64)&unk_154A7DD08);
+    sub_14AE1C7B0(
+      qword_154A73948,
+      (unsigned int)L"/Script/Engine.GarbageCollectionSettings",
+      (unsigned int)L"gc.SizeOfPermanentObjectPool",
+      (unsigned int)&v25,
+      (__int64)&unk_154A7DD08);
+  }
+  sub_14AE1C7B0(
+    qword_154A73948,
+    (unsigned int)L"/Script/Engine.GarbageCollectionSettings",
+    (unsigned int)L"gc.MaxObjectsInGame",
+    (unsigned int)&v26,
+    (__int64)&unk_154A7DD08);
+  sub_14AE1B0B0(
+    qword_154A73948,
+    (unsigned int)L"/Script/Engine.GarbageCollectionSettings",
+    (unsigned int)L"gc.PreAllocateUObjectArray",
+    (unsigned int)&v23,
+    (__int64)&unk_154A7DD08);
+  off_153F960A0(v21);
+  sub_1408EF720(v21, 0i64);
+  if ( off_153F960A0(v21) )
+  {
+    v3 = off_153F960A0(v21);
+    sub_14AD7B320(v3);
+  }
+  if ( (unsigned __int8)byte_154A7DFA0 >= 6u )
+  {
+    v4 = L"Presizing";
+    if ( v23 )
+      v4 = L"Pre-allocating";
+    sub_14ADF5040(
+      (unsigned int)"Unknown",
+      1153,
+      (unsigned int)&unk_154A7DFA4,
+      6,
+      (__int64)L"%s for max %d objects, including %i objects not considered by GC, pre-allocating %i bytes for permanent pool.",
+      v4,
+      v26,
+      v20,
+      v25);
+  }
+  dword_154A9AE30 = v25;
+  v5 = sub_14AD87600(v25, 0i64);
+  v6 = v26;
+  v7 = v23;
+  qword_154A9AE38 = v5;
+  qword_154A9AE40 = v5;
+  qword_154A9AE48 = v5;
+  dword_154A9B220 = v20;
+  dword_154A9B218 = (v20 <= 0) - 1;
+  if ( v26 <= 0 )
+  {
+    sub_14ADF5040(
+      (unsigned int)"Unknown",
+      45,
+      (unsigned int)&unk_154A9AE54,
+      1,
+      (__int64)L"Max UObject count is invalid. It must be a number that is greater than 0.");
+    sub_14AE28230();
+  }
+  v8 = sub_1408F39D0(v6) + 1;
+  dword_154A9B228 = v8;
+  dword_154A9B250 = sub_14B1EFC30((unsigned int)v8);
+  v9 = (unsigned __int64)v8 * (unsigned __int128)8ui64;
+  if ( !is_mul_ok(v8, 8ui64) )
+    *(_QWORD *)&v9 = -1i64;
+  qword_154A9B238 = sub_1426411F0(v9, *((_QWORD *)&v9 + 1));// GObject = 154A9B238
+  sub_14E327C89(qword_154A9B238, 0i64, 8i64 * dword_154A9B228);
+  if ( v7 )
+  {
+    v10 = dword_154A9B250;
+    v11 = (unsigned __int64)dword_154A9B250 * (unsigned __int128)0x18ui64;
+    if ( !is_mul_ok(dword_154A9B250, 0x18ui64) )
+      *(_QWORD *)&v11 = -1i64;
+    v12 = sub_1426411F0(v11, *((_QWORD *)&v11 + 1));
+    v13 = v12;
+    if ( v12 )
+    {
+      if ( v10 )
+      {
+        v14 = v12 + 12;
+        do
+        {
+          *(_BYTE *)v14 &= 0xF0u;
+          *(_QWORD *)(v14 - 12) = 0i64;
+          *(_DWORD *)(v14 - 4) = 0;
+          *(_QWORD *)(v14 + 4) = 0i64;
+          v14 += 24i64;
+          --v10;
+        }
+        while ( v10 );
+      }
+    }
+    else
+    {
+      v13 = 0i64;
+    }
+    v15 = dword_154A9B228;
+    qword_154A9B248 = v13;
+    if ( dword_154A9B228 > 0 )
+    {
+      v16 = 0i64;
+      while ( 1 )
+      {
+        v17 = sub_14B1EFC30((unsigned int)v0);
+        v16 += 8i64;
+        ++v0;
+        // 这里也是特征，明显循环给qword_154A9B238填充对象
+        *(_QWORD *)(v16 + qword_154A9B238 - 8) = v13 + 24i64 * v17;// GObject = 154A9B238
+        v15 = dword_154A9B228;
+        if ( v0 >= dword_154A9B228 )
+          break;
+        v13 = qword_154A9B248;
+      }
+    }
+    HIDWORD(qword_154A9B22C) = v15;
+  }
+  v18 = dword_154A9B220;
+  if ( dword_154A9B220 > 0 )
+  {
+    sub_14B1FE340(&dword_154A9B228, (unsigned int)(dword_154A9B220 + qword_154A9B22C - 1));
+    LODWORD(qword_154A9B22C) = v18 + qword_154A9B22C;
+  }
+  sub_14B045AB0();
+  byte_154A9B084 = 1;
+  sub_14B219750();
+  return sub_1408F5840((v8_qjs::External *)v22);
+}
+```
+
+
+
+### 特征码
+
+```c
+"48 89 05 ?? ?? ?? ?? E8 ?? ?? ?? ?? 40 84 F6 0F 84 ?? ?? ?? ?? 48 63 1D ?? ?? ?? ?? B8"
+```
+
+```c
+155602069 - 48 89 05 30D0740B     - mov [160D4F0A0],rax		// 160D4F0A0就是GObject
+155602070 - E8 E43D7803           - call 158D85E59
+155602075 - 40 84 F6              - test sil,sil
+155602078 - 0F84 A0000000         - je 15560211E
+15560207E - 48 63 1D 33D0740B     - movsxd  rbx,dword ptr [160D4F0B8]
+155602085 - B8 18000000           - mov eax,00000018
 ```

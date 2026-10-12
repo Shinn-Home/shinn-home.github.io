@@ -1,11 +1,11 @@
 ---
-title: "PUBG加密分析"
+title: "PUBG加密分析、解密对象指针"
 date: 2023-08-09T12:00:00+08:00
 lastmod: 2023-08-09T12:00:00+08:00
 draft: false
 author: "Shinn"
 images: []
-tags: ["PUBG", "加密分析", "逆向工程"]
+tags: ["PUBG", "加密分析", "对象指针", "解密", "逆向工程"]
 categories: ["游戏引擎逆向、游戏安全分析"]
 
 twemoji: false
